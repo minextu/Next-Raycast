@@ -1,8 +1,16 @@
+class Camera;
+
 class Player
 {
-	int drawX = 0, drawY = 0, width = 50, height = 200, speed = 10;
-	
+	private:
+		double moveSpeed = 0.1; //squares/second
+		double rotSpeed = 0.05; //radians/second
 	public:
-		void checkKeys(bool[]);
-		void draw(NextEngine);
+		double posX = 22, posY = 12; // intial position
+		double dirX = -1, dirY = 0; // initial direction
+
+	public:
+		void moveForward(int[]);
+		void moveBackward(int[]);
+		void rotate(Camera&, bool);
 };

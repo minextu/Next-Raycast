@@ -1,19 +1,34 @@
-#include "Player.h"
-
-void Player::checkKeys(bool keys[])
+void Player::moveForward(int worldMap[])
 {
-	if (keys[0])
-		this->drawX += this->speed;
-	if (keys[1])
-		this->drawX -= this->speed;
-	if (keys[2])
-		this->drawY += this->speed;
-	if (keys[3])
-		this->drawY -= this->speed;
+	if(worldMap[convert(this->posX + this->dirX * this->moveSpeed, this->posY)] == false) 
+		this->posX += this->dirX * this->moveSpeed;
+	if(worldMap[convert(this->posX,this->posY + this->dirY * this->moveSpeed)] == false) 
+		this->posY += this->dirY * this->moveSpeed;
 }
 
-void Player::draw(NextEngine engine)
+void Player::moveBackward(int worldMap[])
 {
-	engine.setFillColor("red");
-	engine.fillRect(this->drawX,this->drawY,this->width,this->height);
+	if(worldMap[convert(this->posX - this->dirX * this->moveSpeed, this->posY)] == false) 
+		this->posX -= this->dirX * this->moveSpeed;
+	if(worldMap[convert(this->posX,this->posY - this->dirY * this->moveSpeed)] == false) 
+		this->posY -= this->dirY * this->moveSpeed;
+}
+
+void Player::rotate(Camera& camera, bool left)
+{
+	double rot;
+	
+	if (left == false)
+		rot = this->rotSpeed;
+	else
+		rot = -this->rotSpeed;
+	
+	//both camera direction and camera plane must be rotated
+	double oldDirX = this->dirX;
+	this->dirX = this->dirX * cos(rot) - this->dirY * sin(rot);
+	this->dirY = oldDirX * sin(rot) + this->dirY * cos(rot);
+	
+	double oldPlaneX = camera.planeX;
+	camera.planeX = camera.planeX * cos(rot) - camera.planeY * sin(rot);
+	camera.planeY = oldPlaneX * sin(rot) + camera.planeY * cos(rot);
 }
