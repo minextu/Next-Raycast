@@ -1,26 +1,40 @@
 void Player::moveForward(int worldMap[])
 {
-	// Only move, if no wall is in front
-	if( worldMap[convert(this->posX + this->dirX * this->moveSpeed, this->posY)] == 0 &&
-		worldMap[convert(this->posX,this->posY + this->dirY * this->moveSpeed)] == 0 )
-	{
-		this->posX += this->dirX * this->moveSpeed;
-		this->posY += this->dirY * this->moveSpeed;
-	}
+	this->move(worldMap, this->dirX, this->dirY);
 }
 
 void Player::moveBackward(int worldMap[])
 {
-	
-	// Only move, if no wall is behind
-	if( worldMap[convert(this->posX - this->dirX * this->moveSpeed, this->posY)] == 0 &&
-		worldMap[convert(this->posX,this->posY - this->dirY * this->moveSpeed)] == 0 )
-	{
-		this->posX -= this->dirX * this->moveSpeed;
-		this->posY -= this->dirY * this->moveSpeed;
-	}
+	this->move(worldMap, -this->dirX, -this->dirY);
 }
 
+void Player::moveLeft(int worldMap[])
+{
+	double x = this->dirX;
+	double y = this->dirY;
+	rotateDir(x,y,-90);
+	
+	this->move(worldMap, x, y);
+}
+void Player::moveRight(int worldMap[])
+{
+	double x = this->dirX;
+	double y = this->dirY;
+	rotateDir(x,y,90);
+	
+	this->move(worldMap, x, y);
+}
+
+void Player::move(int worldMap[], double dirX, double dirY)
+{
+	// Only move, if no wall is in front
+	if( worldMap[convert(this->posX + dirX * this->moveSpeed, this->posY)] == 0 &&
+		worldMap[convert(this->posX,this->posY + dirY * this->moveSpeed)] == 0 )
+	{
+		this->posX += dirX * this->moveSpeed;
+		this->posY += dirY * this->moveSpeed;
+	}
+}
 void Player::rotate(Camera& camera, bool left)
 {
 	//rotate Speed
@@ -31,6 +45,11 @@ void Player::rotate(Camera& camera, bool left)
 	else
 		rot = -this->rotSpeed;
 	
+	this->rotate(camera, rot);
+}
+
+void Player::rotate(Camera& camera, double rot)
+{
 	//both camera direction and camera plane must be rotated
 	double oldDirX = this->dirX;
 	this->dirX = this->dirX * cos(rot) - this->dirY * sin(rot);

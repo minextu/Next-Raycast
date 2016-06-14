@@ -1,3 +1,5 @@
+class Player;
+
 class Map
 {
 	private:
@@ -9,4 +11,5 @@ class Map
 	public:
 		void setSize(int,int);
 		void set(int[]);
+		void render2d(NextEngine, int[], Player);
 };

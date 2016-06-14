@@ -12,5 +12,9 @@ class Player
 	public:
 		void moveForward(int[]);
 		void moveBackward(int[]);
+		void moveLeft(int[]);
+		void moveRight(int[]);
+		void move(int[], double, double);
 		void rotate(Camera&, bool);
+		void rotate(Camera&, double);
 };
