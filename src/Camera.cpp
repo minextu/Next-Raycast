@@ -116,21 +116,19 @@ void Camera::calculateRay(NextEngine engine, int worldMap[], Player& player)
 				std::string color;
 				switch(worldMap[convert(mapX,mapY)])
 				{
-					case 1:  color = "red";  break; //red
-					case 2:  color = "green";  break; //green
-					case 3:  color = "blue";   break; //blue
-					case 4:  color = "gray";  break; //white
+					case 1:  color = "red";  break;
+					case 2:  color = "green";  break;
+					case 3:  color = "blue";   break;
+					case 4:  color = "gray";  break;
 					default: color = "yellow"; break;
 				}
 
 				//give x and y sides different brightness
 				if (side == 1) 
 					color = "light" + color;
-				//else
-					engine.setAlpha(255);
-
-				//draw the pixels of the stripe as a vertical line
 				engine.setColor(color);
+				
+				//draw the pixels of the stripe as a vertical line
 				engine.drawLine(x, drawStart, x, drawEnd);
 			}
 		} 

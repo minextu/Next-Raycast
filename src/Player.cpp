@@ -1,21 +1,29 @@
 void Player::moveForward(int worldMap[])
 {
-	if(worldMap[convert(this->posX + this->dirX * this->moveSpeed, this->posY)] == false) 
+	// Only move, if no wall is in front
+	if( worldMap[convert(this->posX + this->dirX * this->moveSpeed, this->posY)] == 0 &&
+		worldMap[convert(this->posX,this->posY + this->dirY * this->moveSpeed)] == 0 )
+	{
 		this->posX += this->dirX * this->moveSpeed;
-	if(worldMap[convert(this->posX,this->posY + this->dirY * this->moveSpeed)] == false) 
 		this->posY += this->dirY * this->moveSpeed;
+	}
 }
 
 void Player::moveBackward(int worldMap[])
 {
-	if(worldMap[convert(this->posX - this->dirX * this->moveSpeed, this->posY)] == false) 
+	
+	// Only move, if no wall is behind
+	if( worldMap[convert(this->posX - this->dirX * this->moveSpeed, this->posY)] == 0 &&
+		worldMap[convert(this->posX,this->posY - this->dirY * this->moveSpeed)] == 0 )
+	{
 		this->posX -= this->dirX * this->moveSpeed;
-	if(worldMap[convert(this->posX,this->posY - this->dirY * this->moveSpeed)] == false) 
 		this->posY -= this->dirY * this->moveSpeed;
+	}
 }
 
 void Player::rotate(Camera& camera, bool left)
 {
+	//rotate Speed
 	double rot;
 	
 	if (left == false)
