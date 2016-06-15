@@ -11,5 +11,5 @@ class Map
 	public:
 		void setSize(int,int);
 		void set(int[]);
-		void render2d(NextEngine, int[], Player);
+		void render2d(NextEngine, int[], Player, NextImage[]);
 };

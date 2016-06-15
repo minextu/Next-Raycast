@@ -11,7 +11,7 @@ void Map::set(int map[])
 	this->map = map;
 }
 
-void Map::render2d(NextEngine engine, int worldMap[], Player player)
+void Map::render2d(NextEngine engine, int worldMap[], Player player, NextImage images[])
 {
 	int y = -1;
 	for (int x = 0; x < this->w*this->h; x++)
@@ -22,19 +22,8 @@ void Map::render2d(NextEngine engine, int worldMap[], Player player)
 		int drawX = (x%this->w) * 5;
 		int drawY = y*5;
 		
-		std::string color;
-		switch(worldMap[x])
-		{
-			case 0: color = "black"; break;
-			case 1:  color = "red";  break;
-			case 2:  color = "green";  break;
-			case 3:  color = "blue";   break;
-			case 4:  color = "gray";  break;
-			default: color = "yellow"; break;
-		}
-		
-		engine.setColor(color);
-		engine.fillRect(drawX, drawY, 5, 5);
+		int textureNum = worldMap[x];
+		engine.drawImage(images[textureNum], 0, 0, 64, 64, drawX, drawY, 5, 5);
 	}
 	
 	engine.setColor("red");

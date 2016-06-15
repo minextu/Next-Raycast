@@ -213,7 +213,7 @@ int startLoop(NextEngine engine, NextImage images[])
 int game(NextEngine engine, bool keys[], int loopNum, NextImage images[])
 {
 	camera.calculateRay(engine, worldMap, player, images);
-	map.render2d(engine, worldMap, player);
+	map.render2d(engine, worldMap, player, images);
 	
 	//move forward
     if (keys[3])
