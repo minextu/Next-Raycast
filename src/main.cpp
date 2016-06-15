@@ -35,8 +35,8 @@ void rotateDir(double &x, double &y, int degrees)
 #include "Map.cpp"
 
 
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 768;
 
 int startLoop(NextEngine, NextImage[]);
 int game(NextEngine, bool[], int, NextImage[]);
