@@ -58,3 +58,36 @@ void Player::rotate(Camera& camera, double rot)
 	camera.planeX = camera.planeX * cos(rot) - camera.planeY * sin(rot);
 	camera.planeY = oldPlaneX * sin(rot) + camera.planeY * cos(rot);
 }
+
+void Player::jump()
+{
+	if (this->posZ == 0)
+		this->currentJumpSpeed = this->jumpSpeed;
+}
+
+void Player::checkJump()
+{
+	if (this->currentJumpSpeed != 0)
+	{
+		if (this->isDown)
+		{
+			this->posZ += delta(this->currentJumpSpeed);
+			
+			this->currentJumpSpeed += this->currentJumpSpeed * 0.2;
+			if (this->posZ >= 0)
+			{
+				this->posZ = 0;
+				this->currentJumpSpeed = 0;
+				this->isDown = false;
+			}
+		}
+		else
+		{
+			this->posZ -= delta(this->currentJumpSpeed);
+			
+			this->currentJumpSpeed -= this->currentJumpSpeed * 0.2;
+			if (this->currentJumpSpeed < 2)
+				this->isDown = true;
+		}
+	}
+}

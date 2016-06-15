@@ -167,6 +167,9 @@ void checkEvents(SDL_Event e, bool* quit, bool keys[])
 				case SDLK_n:
 					keys[5] = down;
 					break;
+				case SDLK_SPACE:
+					keys[6] = down;
+					break;
 			}
 		}
 	}	
@@ -233,10 +236,15 @@ int game(NextEngine engine, bool keys[], int loopNum, NextImage images[])
 		player.moveLeft(worldMap);
 	}
 	
+	if (keys[6])
+		player.jump();
+	
 	if (keys[4])
 		camera.angle += delta(3);
 	if (keys[5])
 		camera.angle -= delta(3);
+	
+	player.checkJump();
 	
 	// rotate on mouse move (left and right)
 	player.rotate(camera, (double)(-mouseX) * 0.001);

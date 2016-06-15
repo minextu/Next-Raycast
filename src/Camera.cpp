@@ -29,7 +29,7 @@ void Camera::calculateRay(NextEngine engine, int worldMap[], Player& player, Nex
 		double cameraX = 2 * x / double(w) - 1; //x-coordinate in camera space
 		double rayPosX = posX;
 		double rayPosY = posY;
-		double rayDirX = dirX + planeX * cameraX;
+		double rayDirX = dirX + planeX * cameraX; // add for zoom
 		double rayDirY = dirY + planeY * cameraX;
 		
 		
@@ -130,10 +130,11 @@ void Camera::calculateRay(NextEngine engine, int worldMap[], Player& player, Nex
 				if(side == 1 && rayDirY < 0) 
 					texX = texWidth - texX - 1;
 				
-				engine.drawImage(images[texNum], texX, 0, 1, texHeight, x, drawStart, 1, drawEnd - drawStart);
+				double drawStartZ = drawStart -player.posZ*(1/perpWallDist)*1;
+				engine.drawImage(images[texNum], texX, 0, 1, texHeight, x, drawStartZ, 1, drawEnd - drawStart);
 				
 				if (side == 1)
-					engine.drawImage(images[0], texX, 0, 1, texHeight, x, drawStart, 1, drawEnd - drawStart);
+					engine.drawImage(images[0], texX, 0, 1, texHeight, x, drawStartZ, 1, drawEnd - drawStart);
 			}
 		} 
 	}
