@@ -1,13 +1,16 @@
 #include "Player.h"
 #include "Camera.h"
 
+#define texWidth 64
+#define texHeight 64
+
 Camera::Camera(int w, int h)
 {
 	this->w = w;
 	this->h = h;
 }
 
-void Camera::calculateRay(NextEngine engine, int worldMap[], Player& player)
+void Camera::calculateRay(NextEngine engine, int worldMap[], Player& player, NextImage images[])
 {
 	int w = this->w;
 	int h = this->h;
@@ -103,33 +106,34 @@ void Camera::calculateRay(NextEngine engine, int worldMap[], Player& player)
 
 			//calculate lowest and highest pixel to fill in current stripe
 			int drawStart = -lineHeight / 2 + h / 2 + angle;
-			if(drawStart < 0)
-				drawStart = 0;
-			
 			int drawEnd = lineHeight / 2 + h / 2 + angle;
-			if(drawEnd >= h)
-				drawEnd = h - 1;
+
 			
 			if (hit == 1)
 			{
-				//choose wall color
-				std::string color;
-				switch(worldMap[convert(mapX,mapY)])
-				{
-					case 1:  color = "red";  break;
-					case 2:  color = "green";  break;
-					case 3:  color = "blue";   break;
-					case 4:  color = "gray";  break;
-					default: color = "yellow"; break;
-				}
+				//texturing calculations
+				int texNum = worldMap[convert(mapX,mapY)];
 
-				//give x and y sides different brightness
-				if (side == 1) 
-					color = "light" + color;
-				engine.setColor(color);
+				//calculate value of wallX
+				double wallX; //where exactly the wall was hit
+				if (side == 0) 
+					wallX = rayPosY + perpWallDist * rayDirY;
+				else          
+					wallX = rayPosX + perpWallDist * rayDirX;
 				
-				//draw the pixels of the stripe as a vertical line
-				engine.drawLine(x, drawStart, x, drawEnd);
+				wallX -= floor((wallX));
+					
+				//x coordinate on the texture
+				int texX = int(wallX * double(texWidth));
+				if(side == 0 && rayDirX > 0) 
+					texX = texWidth - texX - 1;
+				if(side == 1 && rayDirY < 0) 
+					texX = texWidth - texX - 1;
+				
+				engine.drawImage(images[texNum], texX, 0, 1, texHeight, x, drawStart, 1, drawEnd - drawStart);
+				
+				if (side == 1)
+					engine.drawImage(images[0], texX, 0, 1, texHeight, x, drawStart, 1, drawEnd - drawStart);
 			}
 		} 
 	}

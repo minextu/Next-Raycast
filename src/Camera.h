@@ -7,5 +7,5 @@ class Camera
 	
 	public:
 		Camera(int,int);
-		void calculateRay(NextEngine, int[], Player&);
+		void calculateRay(NextEngine, int[], Player&, NextImage[]);
 };

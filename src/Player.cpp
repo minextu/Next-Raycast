@@ -28,12 +28,11 @@ void Player::moveRight(int worldMap[])
 void Player::move(int worldMap[], double dirX, double dirY)
 {
 	// Only move, if no wall is in front
-	if( worldMap[convert(this->posX + dirX * this->moveSpeed, this->posY)] == 0 &&
-		worldMap[convert(this->posX,this->posY + dirY * this->moveSpeed)] == 0 )
-	{
-		this->posX += dirX * this->moveSpeed;
-		this->posY += dirY * this->moveSpeed;
-	}
+	if( worldMap[convert(this->posX + dirX * delta(this->moveSpeed) + dirX * this->blockMargin, this->posY)] == 0)
+		this->posX += dirX * delta(this->moveSpeed);
+
+	if(worldMap[convert(this->posX,this->posY + dirY * delta(this->moveSpeed) + dirY * this->blockMargin)] == 0)
+		this->posY += dirY * delta(this->moveSpeed);
 }
 void Player::rotate(Camera& camera, bool left)
 {

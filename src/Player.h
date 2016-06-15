@@ -5,8 +5,9 @@ class Player
 	private:
 		double moveSpeed = 0.05; //squares/second
 		double rotSpeed = 0.05; //radians/second
+		double blockMargin = 0.1;
 	public:
-		double posX = 22, posY = 12; // intial position
+		double posX = 8, posY = 3; // intial position
 		double dirX = -1, dirY = 0; // initial direction
 
 	public:
