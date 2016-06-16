@@ -20,15 +20,15 @@ void Map::render2d(NextEngine engine, int worldMap[], Player player, NextImage i
 			y++;
 		
 		int drawX = (x%this->w) * 5;
-		int drawY = y*5;
+		int drawY = (this->h - y)*5;
 		
 		int textureNum = worldMap[x];
 		engine.drawImage(images[textureNum], 0, 0, 64, 64, drawX, drawY, 5, 5);
 	}
 	
 	engine.setColor("red");
-	engine.fillRect(player.posX*5, player.posY*5, 2, 2);
-	engine.drawLine(player.posX*5, player.posY*5, player.posX*5 + player.dirX*10, player.posY*5 + player.dirY*10);
+	engine.fillRect(player.posX*5, (this->h - player.posY)*5, 2, 2);
+	engine.drawLine(player.posX*5,(this->h - player.posY)*5, player.posX*5 + player.dirX*10, (this->h - player.posY)*5 - player.dirY*10);
 	
 	double rotateX = player.dirX;
 	double rotateY = player.dirY;
