@@ -1,93 +1,96 @@
-void Player::moveForward(int worldMap[])
+#include "Player.h"
+
+void rotateDir(double &x, double &y, int degrees)
 {
-	this->move(worldMap, this->dirX, this->dirY);
+	double rot = degrees * (double)M_PI/180;
+	
+	double oldX = x;
+	x = x * cos(rot) - y * sin(rot);
+	y = oldX * sin(rot) + y * cos(rot);
 }
 
-void Player::moveBackward(int worldMap[])
+double Player::getAngle()
 {
-	this->move(worldMap, -this->dirX, -this->dirY);
+	return this->angle;
 }
 
-void Player::moveLeft(int worldMap[])
+double Player::getZAngle()
 {
-	double x = this->dirX;
-	double y = this->dirY;
+	return this->zAngle;
+}
+
+double Player::getX()
+{
+	return this->x;
+}
+
+double Player::getY()
+{
+	return this->y;
+}
+
+double Player::getZ()
+{
+	return this->z;
+}
+
+void Player::moveForward()
+{
+	double speedX = std::cos(this->angle);
+	double speedY = std::sin(this->angle);
+	this->move( speedX, speedY);
+}
+
+void Player::moveBackward()
+{
+	double speedX = std::cos(this->angle);
+	double speedY = std::sin(this->angle);
+	this->move(-speedX, -speedY);
+}
+
+void Player::moveLeft()
+{
+	double x = std::cos(this->angle);
+	double y = std::sin(this->angle);
 	rotateDir(x,y,-90);
 	
-	this->move(worldMap, x, y);
+	this->move(x, y);
 }
-void Player::moveRight(int worldMap[])
+void Player::moveRight()
 {
-	double x = this->dirX;
-	double y = this->dirY;
+	double x = std::cos(this->angle);
+	double y = std::sin(this->angle);
 	rotateDir(x,y,90);
 	
-	this->move(worldMap, x, y);
+	this->move(x, y);
 }
 
-void Player::move(int worldMap[], double dirX, double dirY)
+void Player::move(double speedX, double speedY)
 {
 	// Only move, if no wall is in front
-	if( worldMap[convert(this->posX + dirX * delta(this->moveSpeed) + dirX * this->blockMargin, this->posY)] == 0)
-		this->posX += dirX * delta(this->moveSpeed);
+	/*if( worldMap[convert(this->posX + dirX * delta(this->moveSpeed) + dirX * this->blockMargin, this->posY)] == 0)*/
+	this->x += speedX*this->moveSpeed;
 
-	if(worldMap[convert(this->posX,this->posY + dirY * delta(this->moveSpeed) + dirY * this->blockMargin)] == 0)
-		this->posY += dirY * delta(this->moveSpeed);
-}
-void Player::rotate(Camera& camera, bool left)
-{
-	//rotate Speed
-	double rot;
-	
-	if (left == false)
-		rot = this->rotSpeed;
-	else
-		rot = -this->rotSpeed;
-	
-	this->rotate(camera, rot);
+	/*if(worldMap[convert(this->posX,this->posY + dirY * delta(this->moveSpeed) + dirY * this->blockMargin)] == 0)*/
+	this->y += speedY*this->moveSpeed;
 }
 
-void Player::rotate(Camera& camera, double rot)
+void Player::moveUp()
 {
-	//both camera direction and camera plane must be rotated
-	double oldDirX = this->dirX;
-	this->dirX = this->dirX * cos(rot) - this->dirY * sin(rot);
-	this->dirY = oldDirX * sin(rot) + this->dirY * cos(rot);
-	
-	double oldPlaneX = camera.planeX;
-	camera.planeX = camera.planeX * cos(rot) - camera.planeY * sin(rot);
-	camera.planeY = oldPlaneX * sin(rot) + camera.planeY * cos(rot);
+	this->z += this->flySpeed;
 }
 
-void Player::jump()
+void Player::moveDown()
 {
-	if (this->posZ == 0)
-		this->currentJumpSpeed = this->jumpSpeed;
+	this->z -= this->flySpeed;
 }
 
-void Player::checkJump()
+void Player::rotate(double speed)
 {
-	if (this->currentJumpSpeed != 0)
-	{
-		if (this->isDown)
-		{
-			this->posZ += delta(this->currentJumpSpeed);
-			
-			this->currentJumpSpeed += this->currentJumpSpeed * 0.2;
-			if (this->posZ >= 0)
-			{
-				this->posZ = 0;
-				this->currentJumpSpeed = 0;
-				this->isDown = false;
-			}
-		}
-		else
-		{
-			this->posZ -= delta(this->currentJumpSpeed);
-			
-			this->currentJumpSpeed -= this->currentJumpSpeed * 0.2;
-			if (this->currentJumpSpeed < 2)
-				this->isDown = true;
-		}
-	}
+	this->angle += speed;
+}
+
+void Player::addZAngle(double angle)
+{
+	this->zAngle += angle;
 }
