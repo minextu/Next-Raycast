@@ -39,22 +39,24 @@ int startLoop(NextEngine&, NextImage[]);
 int game(NextEngine&, int, NextImage[]);
 
 
-// loads textures to vram
+// loads textures and fonts to vram
 int textureNum = 9;
-void loadTextures(NextEngine& engine, NextImage images[])
+void loadMedia(NextEngine& engine, NextImage images[])
 {	
 	const std::string resPath = getResourcePath();
 	std::string imageName;
 	
 	images[0].setEngine(engine);
-	images[0].load(resPath + "block_overlay.png");
+	images[0].load(resPath + "textures/block_overlay.png");
 	
 	for (int i = 1; i <= textureNum; i++)
 	{
 		images[i].setEngine(engine);
-		imageName = "texture" + std::to_string(i) + ".png";
+		imageName = "textures/texture" + std::to_string(i) + ".png";
 		images[i].load(resPath + imageName);
 	}
+	
+	engine.setFont(resPath + "fonts/OpenSans-Regular.ttf", 22);
 }
 
 Map map;
@@ -96,7 +98,7 @@ int main()
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 	
 	NextImage images[textureNum+1];
-	loadTextures(engine, images);
+	loadMedia(engine, images);
 	
 	newGame(engine, images);
 	startLoop(engine, images);
@@ -177,6 +179,10 @@ int startLoop(NextEngine& engine, NextImage images[])
 		// main game loop
 		game(engine, loopNum, images);
 		
+		// show fps
+		engine.setColor("white");
+		engine.fillText("FPS:" + std::to_string(currentFps), 0,screenHeight - 40);
+		
 		// draw all changes
 		engine.render();
 		
@@ -185,10 +191,6 @@ int startLoop(NextEngine& engine, NextImage images[])
 		currentFps = 1000 / (currentTime - lastTime);
 		
 		lastTime = currentTime;
-
-		
-		if (loopNum % 100 == 0)
-			std::cout << currentFps << ",";
 	}
 }
 
