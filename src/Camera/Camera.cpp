@@ -1,4 +1,5 @@
 #include "Ray.cpp"
+#include "Line.cpp"
 #include "Camera.h"
 
 // debug
@@ -22,6 +23,9 @@ void Camera::setTextures(NextImage images[])
 
 void Camera::renderMap(Map& map)
 {
+	// adapt fov to current screen ratio
+	this->currentFov = (double)this->fov / (4.0/3) * ((double)screenWidth/screenHeight);
+	
 	double rayStartX = this->player->getX();
 	double rayStartY = this->player->getY();
 	double startAngle = this->player->getAngle();
@@ -30,7 +34,7 @@ void Camera::renderMap(Map& map)
 	for (int screenX = 0; screenX <= screenWidth / 2; screenX++)
 	{
 		// rays should be send with linear angle difference until the fov is reached
-		double rayDiff = ((double)this->fov / 2) / screenWidth * screenX;
+		double rayDiff = (this->currentFov / 2) / screenWidth * screenX;
 		rayDiff *= M_PI / 180;
 		
 		// right from screen center
@@ -51,9 +55,7 @@ void Camera::renderRay(Map& map, double rayStartX, double rayStartY, int screenX
 	if (screenX == 0 || screenX == screenWidth / 2 || screenX == -screenWidth / 2)
 		drawBorderCrossCircle(this->engine, collisions);
 	
-	// render blocks further away first, so closer ones can overwrite them (if jumping would not be allowed, only the first block has to be rendered)
-	std::reverse(collisions.begin(), collisions.end());
-	
+	std::vector<Line> blockLines;
 	for (int i = 0; i < collisions.size(); ++i)
 	{
 		double blockX = std::floor(collisions[i].x);
@@ -63,22 +65,29 @@ void Camera::renderRay(Map& map, double rayStartX, double rayStartY, int screenX
 		if (collisions[i].y == blockY)
 		{
 			// upper block border
-			this->renderBlockLine(blockX, blockY, collisions[i], rayStartX, rayStartY, map, screenX, 1);
+			this->generateBlockLine(blockLines, blockX, blockY, collisions[i], rayStartX, rayStartY, map, screenX, 1);
 			// bottom block border
-			this->renderBlockLine(blockX, blockY-1, collisions[i], rayStartX, rayStartY, map, screenX, 3);
+			this->generateBlockLine(blockLines, blockX, blockY-1, collisions[i], rayStartX, rayStartY, map, screenX, 3);
 			
 		}
 		else if (collisions[i].x == blockX)
 		{
 			// left block border
-			this->renderBlockLine(blockX, blockY, collisions[i], rayStartX, rayStartY, map, screenX, 2);
+			this->generateBlockLine(blockLines, blockX, blockY, collisions[i], rayStartX, rayStartY, map, screenX, 2);
 			// right block border
-			this->renderBlockLine(blockX-1, blockY, collisions[i], rayStartX, rayStartY, map, screenX, 4);
+			this->generateBlockLine(blockLines, blockX-1, blockY, collisions[i], rayStartX, rayStartY, map, screenX, 4);
 		}
 	}
+	// render blocks further away first, so closer ones can overwrite them (if jumping would not be allowed, only the first block has to be rendered)
+	std::reverse(blockLines.begin(), blockLines.end());
+	this->renderBlockLines(blockLines, screenX);
 }
+int lastX = 0;
+int lastY = 0;
+int lastHeight = 0;
+int lastWidth = 0;
 
-void Camera::renderBlockLine(double blockX, double blockY, RayCollision collision, double rayStartX, double rayStartY, Map& map, double offsetX, int side)
+void Camera::generateBlockLine(std::vector<Line> &blockLines, double blockX, double blockY, RayCollision collision, double rayStartX, double rayStartY, Map& map, double offsetX, int side)
 {
 	Block *blockPtr = map.getBlock(blockX, blockY);
 	
@@ -91,58 +100,94 @@ void Camera::renderBlockLine(double blockX, double blockY, RayCollision collisio
 		double fishEyeLength = std::sqrt( std::pow(rayStartX - collision.x, 2) + pow(rayStartY - collision.y, 2) );
 		
 		// -fov/2 for the most left ray, 0 for the center and fov/2 for the most right ray. (After that convert from degress to radiens)
-		double angleOffset = (((double)fov / 2) / (screenWidth) * offsetX) * M_PI / 180;
+		double angleOffset = ((this->currentFov / 2) / (screenWidth) * offsetX) * M_PI / 180;
 		// because the screen is flat, every line would appear distorted (fish eye effect)
 		// to fix this, the length of each ray has to be corrected, by multiplying it with cos(angleOffset)
 		double length = fishEyeLength * std::cos(angleOffset);
 		
-		double height = block.zHeight;
+		double height = block.zHeight / 768.0 * screenHeight;
 		height = height / (length);
-			
-		if (block.type == 1)
+		double width = 1;
+		
+		double drawX =  screenWidth / 2 + offsetX;
+		double drawY = screenHeight - height;
+		
+		// player Z position (move closer blocks faster than others)
+		drawY += this->player->getZ() / 768.0 * screenHeight * (1/length);
+		// viewing angle (moving everything down, appears like looking up
+		drawY -= this->player->getZAngle();
+		// block offset from ground
+		drawY -= block.zOffset* (1/length);
+
+		// skip drawing if block is completly covered by the previous block
+		if (drawX >= lastX && drawX + width <= lastX + lastWidth && drawY >= lastY && drawY + height <= lastY + lastHeight)
+			return;
+		else
 		{
-			if (side == 1 || side == 3)
+			// save all proberties in a line object
+			Line line;
+			line.drawX = drawX;
+			line.drawY = drawY;
+			line.width = width;
+			line.height = height;
+			
+			line.blockX = blockX;
+			line.blockY = blockY;
+			line.side = side;
+			line.collision = collision;
+			line.textureNum = block.type;
+			
+			blockLines.push_back(line);
+			
+			lastX = drawX;
+			lastY = drawY;
+			lastWidth = width;
+			lastHeight = height;
+		}
+	}
+	
+	
+}
+
+void Camera::renderBlockLines(std::vector<Line> &blockLines, int offsetX)
+{
+	for (int i = 0; i < blockLines.size(); i++)
+	{
+		Line line = blockLines[i];
+		
+		//x coordinate on the texture
+		int textureX = -1;
+
+		if (line.side == 3)
+			textureX = (line.collision.x - line.blockX) * textureWidth;
+		else if (line.side == 1)
+			textureX = textureWidth - (line.collision.x - line.blockX) * textureWidth;
+		else if (line.side == 2)
+			textureX = (line.collision.y - line.blockY) * textureWidth;
+		else if (line.side == 4)
+			textureX = textureWidth - (line.collision.y - line.blockY) * textureWidth;
+
+		// use darker texture for every second texture
+		if (line.textureNum == 1)
+		{
+			if (line.side == 1 || line.side == 3)
 				this->engine.setColor("lightblue");
 			else
 				this->engine.setColor("blue");
 		}
 		else
 		{
-			if (side == 1 || side == 3)
+			if (line.side == 1 || line.side == 3)
 				this->engine.setColor("lightgreen");
 			else
 				this->engine.setColor("green");
 		}
-		
-		double drawX =  screenWidth / 2 + offsetX;
-		double drawY = screenHeight - height;
-		
-		// player Z position (move closer blocks faster than others)
-		drawY += this->player->getZ() * (1/length);
-		// viewing angle (moving everything down, appears like looking up
-		drawY -= this->player->getZAngle();
-		// block offset from ground
-		drawY -= block.zOffset* (1/length);
-
-		
-		//x coordinate on the texture
-		int textureX = -1;
-
-		if (side == 3)
-			textureX = (collision.x - blockX) * textureWidth;
-		else if (side == 1)
-			textureX = textureWidth - (collision.x - blockX) * textureWidth;
-		else if (side == 2)
-			textureX = (collision.y - blockY) * textureWidth;
-		else if (side == 4)
-			textureX = textureWidth - (collision.y - blockY) * textureWidth;
-
-			
+				
 		double textureY = 0;
 		double textureW = 1;
 		double textureH = textureHeight;
-		
-		//this->engine.fillRect(screenWidth / 2 + offsetX, drawY, 1, height);
-		this->engine.drawImage(this->textures[block.type], textureX, textureY, textureW, textureH, drawX, drawY, 1, height);
+			
+		//this->engine.fillRect(screenWidth / 2 + offsetX, line.drawY, 1, line.height);
+		this->engine.drawImage(this->textures[line.textureNum], textureX, textureY, textureW, textureH, line.drawX, line.drawY, line.width, line.height);
 	}
 }

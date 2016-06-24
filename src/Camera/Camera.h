@@ -2,7 +2,8 @@ class Camera
 {
 	private:
 		Player* player;
-		int fov = 90;
+		int fov = 100;
+		double currentFov;
 		NextEngine engine;
 		NextImage* textures;
 		
@@ -13,6 +14,7 @@ class Camera
 		void renderMap(Map&);
 	private:
 		void renderRay(Map&, double, double, int, double);
-		void renderBlockLine(double, double, RayCollision collision, double, double, Map&, double, int);
+		void generateBlockLine(std::vector<Line>&, double, double, RayCollision collision, double, double, Map&, double, int);
+		void renderBlockLines(std::vector<Line>&, int);
 
 };
