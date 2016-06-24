@@ -17,6 +17,9 @@
 int screenWidth = 1024;
 int screenHeight = 768;
 
+int const textureWidth = 1024;
+int const textureHeight = 1024;
+
 #include "Map/Map.cpp"
 #include "Player.cpp"
 #include "Camera/Camera.cpp"
@@ -55,7 +58,7 @@ void loadTextures(NextEngine& engine, NextImage images[])
 Map map;
 Player player;
 Camera camera;
-void newGame(NextEngine& engine)
+void newGame(NextEngine& engine, NextImage images[])
 {
 	std::vector<Block> mapArr  = 
 	{
@@ -78,6 +81,7 @@ void newGame(NextEngine& engine)
 	
 	camera.setEngine(engine);
 	camera.setPlayer(&player);
+	camera.setTextures(images);
 }
 
 int main()
@@ -92,7 +96,7 @@ int main()
 	NextImage images[textureNum+1];
 	loadTextures(engine, images);
 	
-	newGame(engine);
+	newGame(engine, images);
 	startLoop(engine, images);
 	
 	return 0;
@@ -116,8 +120,8 @@ void checkEvents(SDL_Event e, bool* quit)
 			mouse.x = 0;
 			mouse.y = 0;
 		}
-		// clicked inside the window
-		else if (e.type == SDL_MOUSEBUTTONDOWN)
+		// clicked inside the window when previously lost focus
+		else if (!mouse.enabled && e.type == SDL_MOUSEBUTTONDOWN)
 		{
 			mouse.enabled = true;
 			SDL_GetRelativeMouseState(&mouse.x, &mouse.y);
@@ -129,8 +133,20 @@ void checkEvents(SDL_Event e, bool* quit)
 			screenWidth = e.window.data1;
 			screenHeight = e.window.data2;
 		}
+		else if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
+		{
+			bool down = false;
+			if (e.type == SDL_MOUSEBUTTONDOWN)
+				down = true;
+			
+			if (e.button.button == SDL_BUTTON_LEFT)
+				mouse.left = down;
+			else if (e.button.button == SDL_BUTTON_RIGHT)
+				mouse.right = down;
+		}
 		// other keys (will be handled by struct Keyboard
-		keyboard.getKey(e);
+		else
+			keyboard.getKey(e);
 
 	}	
 }
@@ -198,6 +214,25 @@ int game(NextEngine& engine, int loopNum, NextImage images[])
 	
 	player.rotate(mouse.x*0.001);
 	player.addZAngle(mouse.y);
+	
+	if (mouse.right || mouse.left)
+	{
+		Ray ray(player.getX(), player.getY(), player.getAngle());
+		ray.setMapSize(map.getWidth(), map.getHeight());
+		std::vector<RayCollision> collisions = ray.send(true, true, &map);
+		
+		double blockX = std::floor(collisions[0].x);
+		double blockY = std::floor(collisions[0].y);
+		Block* block = map.getBlock(blockX,blockY);
+		
+		if (mouse.left)
+			block->type++;
+		else
+			block->type--;
+		
+		mouse.right = false;
+		mouse.left = false;
+	}
 	
 	// debug
 	drawGrid(engine,map);

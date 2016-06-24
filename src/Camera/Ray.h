@@ -7,4 +7,5 @@ class Ray
 		Ray(double, double, double);
 		void setMapSize(int, int);
 		std::vector<RayCollision> send();
+		std::vector<RayCollision> send(bool, bool, Map*);
 };

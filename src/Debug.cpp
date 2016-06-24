@@ -29,7 +29,7 @@ void drawMap(NextEngine& engine, Map& map)
 	{
 		for (int y = 0; y < map.getHeight(); y++)
 		{
-			Block block = map.getBlock(x,y);
+			Block block = *map.getBlock(x,y);
 			if (block.type != 0)
 			{
 				if (block.type == 1)

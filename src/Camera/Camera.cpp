@@ -15,6 +15,11 @@ void Camera::setPlayer(Player* player)
 	this->player = player;
 }
 
+void Camera::setTextures(NextImage images[])
+{
+	this->textures = images;
+}
+
 void Camera::renderMap(Map& map)
 {
 	double rayStartX = this->player->getX();
@@ -75,16 +80,18 @@ void Camera::renderRay(Map& map, double rayStartX, double rayStartY, int screenX
 
 void Camera::renderBlockLine(double blockX, double blockY, RayCollision collision, double rayStartX, double rayStartY, Map& map, double offsetX, int side)
 {
-	Block block = map.getBlock(blockX, blockY);
+	Block *blockPtr = map.getBlock(blockX, blockY);
 	
-	if (block.type != 0)
+	if (blockPtr != nullptr && blockPtr->type != 0)
 	{
+		Block block = *blockPtr;
+		
 		// distance between ray start point and block
 		// Formular: sqrt( (x2 - x1)^2 + (y2 - y1)^2 )
 		double fishEyeLength = std::sqrt( std::pow(rayStartX - collision.x, 2) + pow(rayStartY - collision.y, 2) );
 		
 		// -fov/2 for the most left ray, 0 for the center and fov/2 for the most right ray. (After that convert from degress to radiens)
-		double angleOffset = ((fov / 2) / (screenWidth) * offsetX) * M_PI / 180;
+		double angleOffset = (((double)fov / 2) / (screenWidth) * offsetX) * M_PI / 180;
 		// because the screen is flat, every line would appear distorted (fish eye effect)
 		// to fix this, the length of each ray has to be corrected, by multiplying it with cos(angleOffset)
 		double length = fishEyeLength * std::cos(angleOffset);
@@ -107,6 +114,7 @@ void Camera::renderBlockLine(double blockX, double blockY, RayCollision collisio
 				this->engine.setColor("green");
 		}
 		
+		double drawX =  screenWidth / 2 + offsetX;
 		double drawY = screenHeight - height;
 		
 		// player Z position (move closer blocks faster than others)
@@ -114,6 +122,26 @@ void Camera::renderBlockLine(double blockX, double blockY, RayCollision collisio
 		// viewing angle (moving everything down, appears like looking up
 		drawY -= this->player->getZAngle();
 		
-		this->engine.fillRect(screenWidth / 2 + offsetX, drawY, 1, height);
+
+		
+		//x coordinate on the texture
+		int textureX = -1;
+
+		if (side == 3)
+			textureX = (collision.x - blockX) * textureWidth;
+		else if (side == 1)
+			textureX = textureWidth - (collision.x - blockX) * textureWidth;
+		else if (side == 2)
+			textureX = (collision.y - blockY) * textureWidth;
+		else if (side == 4)
+			textureX = textureWidth - (collision.y - blockY) * textureWidth;
+
+			
+		double textureY = 0;
+		double textureW = 1;
+		double textureH = textureHeight;
+		
+		//this->engine.fillRect(screenWidth / 2 + offsetX, drawY, 1, height);
+		this->engine.drawImage(this->textures[block.type], textureX, textureY, textureW, textureH, drawX, drawY, 1, height);
 	}
 }

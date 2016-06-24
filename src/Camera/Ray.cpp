@@ -13,8 +13,11 @@ void Ray::setMapSize(int width, int height)
 	this->mapWidth = width;
 	this->mapHeight = height;
 }
-
 std::vector<RayCollision> Ray::send()
+{
+	return this->send(false, false, nullptr);
+}
+std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 {
 	std::vector<RayCollision> collisions;
 	
@@ -78,12 +81,36 @@ std::vector<RayCollision> Ray::send()
 		else
 			distance = distanceY;
 		
+		// stop if first block was hit
+		if (stopFirst)
+		{
+			double blockX = std::floor(posX);
+			double blockY = std::floor(posY);
+			Block* block = map->getBlock(blockX,blockY);
+			
+			if (block != nullptr && block->type != 0)
+			{
+				end = true;
+				break;
+			}
+		}
+
 		// jump to ne next block border
 		posX += speedX * distance;
 		posY += speedY * distance;
 		
 		// save the position
-		collisions.push_back(RayCollision(posX, posY));
+		if (!hideAir)
+			collisions.push_back(RayCollision(posX, posY));
+		else
+		{
+			double blockX = std::floor(posX);
+			double blockY = std::floor(posY);
+			Block* block = map->getBlock(blockX,blockY);
+			
+			if (block != nullptr && block->type != 0)
+				collisions.push_back(RayCollision(posX, posY));
+		}
 		
 		// stop the loop, if we are past the map size
 		if (speedX < 0 && posX <= 0 || speedX > 0 && posX >= mapWidth || speedY < 0 && posY <= 0 || speedY > 0 && posY >= mapHeight)

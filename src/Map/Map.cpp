@@ -27,9 +27,20 @@ const std::vector<Block> Map::get() const
 	return this->map;
 }
 
-const Block Map::getBlock(int x, int y) const
+Block* Map::getBlock(int x, int y)
 {
 	// convert x, y to 1D Array index
 	int mapIndex = y * this->width + x;
-	return this->map[mapIndex];
+	
+	if (mapIndex < 0)
+		return nullptr;
+	
+	try
+    {
+       return &this->map.at(mapIndex);
+    }
+    catch(const std::out_of_range& oor)
+	{
+		return nullptr;
+	}
 }

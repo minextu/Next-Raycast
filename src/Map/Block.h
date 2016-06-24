@@ -4,7 +4,7 @@ struct Block
 	int zOffset = 0;
 	int width = 1;
 	int height = 1;
-	int zHeight = 500;
+	int zHeight = 900;
 	
 	Block(int);
 };

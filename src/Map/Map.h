@@ -8,6 +8,6 @@ class Map
 		void setSize(int,int);
 		int getWidth();
 		int getHeight();
-		const Block getBlock(int, int) const;
+		Block* getBlock(int, int);
 		const std::vector<Block> get() const;
 };

@@ -4,8 +4,10 @@ class Camera
 		Player* player;
 		int fov = 90;
 		NextEngine engine;
+		NextImage* textures;
 		
 	public:
+		void setTextures(NextImage[]);
 		void setPlayer(Player*);
 		void setEngine(NextEngine&);
 		void renderMap(Map&);
