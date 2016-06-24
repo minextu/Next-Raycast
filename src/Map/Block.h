@@ -7,4 +7,6 @@ struct Block
 	int zHeight = 900;
 	
 	Block(int);
+	Block(int,int);
+	Block(int,int,int);
 };

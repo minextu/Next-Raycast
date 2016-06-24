@@ -76,7 +76,9 @@ void newGame(NextEngine& engine, NextImage images[])
 		{2},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{2},
 		{2},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{2},
 		{2},{2},{2},{2},{2},{2},{2},{2},{2},{2},{2},{2},{2}
-	}; 
+	};
+
+
 	
 	map.set(mapArr);
 	map.setSize(13,10);
@@ -201,23 +203,33 @@ int game(NextEngine& engine, int loopNum, NextImage images[])
 	engine.fillRect(0, 0, debugSize*13,debugSize*10);
 	
 		
-	camera.renderMap(map);
 	
-	if (keyboard.up)
-		player.moveForward();
-	if (keyboard.down)
-		player.moveBackward();
-	if (keyboard.left)
-		player.moveLeft();
-	if (keyboard.right)
-		player.moveRight();
-	if (keyboard.h)
-		player.moveUp();
-	if (keyboard.n)
-		player.moveDown();
+	// debug: handle Benchmark
+	checkBenchmark(keyboard, player, camera);
 	
-	player.rotate(mouse.x*0.001);
-	player.addZAngle(mouse.y);
+	if (!useBenchmarkMap)
+		camera.renderMap(map);
+	else
+		camera.renderMap(benchmarkMap);
+	
+	if (!isBenchmark)
+	{
+		if (keyboard.up)
+			player.moveForward();
+		if (keyboard.down)
+			player.moveBackward();
+		if (keyboard.left)
+			player.moveLeft();
+		if (keyboard.right)
+			player.moveRight();
+		if (keyboard.h)
+			player.moveUp();
+		if (keyboard.n)
+			player.moveDown();
+		
+		player.rotate(mouse.x*0.001);
+		player.addZAngle(mouse.y);
+	}
 	
 	// debug: resize, change texture of block
 	modifyMap(mouse, keyboard, player, map);

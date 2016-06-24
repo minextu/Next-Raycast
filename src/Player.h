@@ -11,6 +11,12 @@ class Player
 		double getY();
 		double getZ();
 		
+		void setAngle(double);
+		void setZAngle(double);
+		void setX(double);
+		void setY(double);
+		void setZ(double);
+		
 		void moveLeft();
 		void moveRight();
 		void moveForward();

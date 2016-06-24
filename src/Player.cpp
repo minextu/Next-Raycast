@@ -34,6 +34,31 @@ double Player::getZ()
 	return this->z;
 }
 
+void Player::setAngle(double angle)
+{
+	this->angle = angle;
+}
+
+void Player::setZAngle(double angle)
+{
+	this->zAngle = angle;
+}
+
+void Player::setX(double x)
+{
+	this->x = x;
+}
+
+void Player::setY(double y)
+{
+	this->y = y;
+}
+
+void Player::setZ(double z)
+{
+	this->z = z;
+}
+
 void Player::moveForward()
 {
 	double speedX = std::cos(this->angle);

@@ -44,6 +44,12 @@ void Keyboard::getKey(SDL_Event e)
 			case SDLK_3:
 				this->three = down;
 				break;
+			case SDLK_9:
+				this->nine = down;
+				break;
+			case SDLK_0:
+				this->zero = down;
+				break;
 		}
 	}
 }
