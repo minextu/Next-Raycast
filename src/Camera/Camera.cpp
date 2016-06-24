@@ -121,7 +121,8 @@ void Camera::renderBlockLine(double blockX, double blockY, RayCollision collisio
 		drawY += this->player->getZ() * (1/length);
 		// viewing angle (moving everything down, appears like looking up
 		drawY -= this->player->getZAngle();
-		
+		// block offset from ground
+		drawY -= block.zOffset* (1/length);
 
 		
 		//x coordinate on the texture

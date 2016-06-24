@@ -215,26 +215,10 @@ int game(NextEngine& engine, int loopNum, NextImage images[])
 	player.rotate(mouse.x*0.001);
 	player.addZAngle(mouse.y);
 	
-	if (mouse.right || mouse.left)
-	{
-		Ray ray(player.getX(), player.getY(), player.getAngle());
-		ray.setMapSize(map.getWidth(), map.getHeight());
-		std::vector<RayCollision> collisions = ray.send(true, true, &map);
-		
-		double blockX = std::floor(collisions[0].x);
-		double blockY = std::floor(collisions[0].y);
-		Block* block = map.getBlock(blockX,blockY);
-		
-		if (mouse.left)
-			block->type++;
-		else
-			block->type--;
-		
-		mouse.right = false;
-		mouse.left = false;
-	}
+	// debug: resize, change texture of block
+	modifyMap(mouse, keyboard, player, map);
 	
-	// debug
+	// debug: show map
 	drawGrid(engine,map);
 	drawMap(engine,map);
 }

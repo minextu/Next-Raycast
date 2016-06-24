@@ -35,6 +35,15 @@ void Keyboard::getKey(SDL_Event e)
 			case SDLK_SPACE:
 				this->space = down;
 				break;
+			case SDLK_1:
+				this->one = down;
+				break;
+			case SDLK_2:
+				this->two = down;
+				break;
+			case SDLK_3:
+				this->three = down;
+				break;
 		}
 	}
 }
