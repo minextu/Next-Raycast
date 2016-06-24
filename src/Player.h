@@ -3,7 +3,7 @@ class Player
 	private:
 		double angle = 0, zAngle = 0;
 		double x = 2, y = 2, z = 400, height = 400;
-		double moveSpeed = 0.05, flySpeed = 5;
+		double moveSpeed = 0.05, flySpeed = 10;
 	public:
 		double getAngle();
 		double getZAngle();

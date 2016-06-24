@@ -78,9 +78,9 @@ void modifyMap(Mouse& mouse, Keyboard& keyboard, Player& player, Map& map)
 				mouse.left = false;
 			}
 			else if (debugMode == 2)
-				block->zHeight += 10;
+				block->zHeight += delta(10);
 			else if (debugMode == 3)
-				block->zOffset+=10;
+				block->zOffset += delta(10);
 		}
 		if (mouse.right)
 		{
@@ -90,9 +90,9 @@ void modifyMap(Mouse& mouse, Keyboard& keyboard, Player& player, Map& map)
 				mouse.right = false;
 			}
 			else if (debugMode == 2)
-				block->zHeight -= 10;
+				block->zHeight -= delta(10);
 			else if (debugMode == 3)
-				block->zOffset-=10;
+				block->zOffset-= delta(10);
 		}
 	}
 			

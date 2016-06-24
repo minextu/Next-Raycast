@@ -20,6 +20,8 @@ int screenHeight = 768;
 int const textureWidth = 1024;
 int const textureHeight = 1024;
 
+double delta(double x);
+
 #include "Map/Map.cpp"
 #include "Player.cpp"
 #include "Camera/Camera.cpp"
@@ -186,7 +188,7 @@ int startLoop(NextEngine& engine, NextImage images[])
 
 		
 		if (loopNum % 100 == 0)
-			std::cout << currentFps << ": " << delta(currentFps) << ",";
+			std::cout << currentFps << ",";
 	}
 }
 

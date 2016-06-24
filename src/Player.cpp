@@ -69,20 +69,20 @@ void Player::move(double speedX, double speedY)
 {
 	// Only move, if no wall is in front
 	/*if( worldMap[convert(this->posX + dirX * delta(this->moveSpeed) + dirX * this->blockMargin, this->posY)] == 0)*/
-	this->x += speedX*this->moveSpeed;
+	this->x += delta(speedX*this->moveSpeed);
 
 	/*if(worldMap[convert(this->posX,this->posY + dirY * delta(this->moveSpeed) + dirY * this->blockMargin)] == 0)*/
-	this->y += speedY*this->moveSpeed;
+	this->y += delta(speedY*this->moveSpeed);
 }
 
 void Player::moveUp()
 {
-	this->z += this->flySpeed;
+	this->z += delta(this->flySpeed);
 }
 
 void Player::moveDown()
 {
-	this->z -= this->flySpeed;
+	this->z -= delta(this->flySpeed);
 }
 
 void Player::rotate(double speed)
