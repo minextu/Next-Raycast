@@ -29,18 +29,12 @@ const std::vector<Block> Map::get() const
 
 Block* Map::getBlock(int x, int y)
 {
+	if (x >= this->width || y >= this->height || x < 0 || y < 0)
+		return nullptr;
+	
 	// convert x, y to 1D Array index
 	int mapIndex = y * this->width + x;
-	
-	if (mapIndex < 0)
-		return nullptr;
-	
-	try
-    {
-       return &this->map.at(mapIndex);
-    }
-    catch(const std::out_of_range& oor)
-	{
-		return nullptr;
-	}
+
+	return &this->map.at(mapIndex);
+
 }
