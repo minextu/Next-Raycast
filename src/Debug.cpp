@@ -66,8 +66,8 @@ void modifyMap(Mouse& mouse, Keyboard& keyboard, Player& player, Map& map)
 		ray.setMapSize(map.getWidth(), map.getHeight());
 		std::vector<RayCollision> collisions = ray.send(true, true, &map);
 		
-		double blockX = std::floor(collisions[0].x);
-		double blockY = std::floor(collisions[0].y);
+		double blockX = floor(collisions[0].x);
+		double blockY = floor(collisions[0].y);
 		Block* block = map.getBlock(blockX,blockY);
 		
 		if (mouse.left)
@@ -140,6 +140,18 @@ int useBenchmarkMap = false;
 int benchmarkState = 0;
 Player* benchmarkPlayer = nullptr;
 
+void startBenchmark(Camera &camera)
+{
+	delete benchmarkPlayer;
+	benchmarkPlayer = new Player();
+	benchmarkState = 0;
+			
+	initBenchmarkMap();
+			
+	camera.setPlayer(benchmarkPlayer);
+			
+	useBenchmarkMap = true;
+}
 void checkBenchmark(Keyboard& keyboard, Player& player, Camera &camera)
 {
 	if (keyboard.nine)
@@ -157,15 +169,7 @@ void checkBenchmark(Keyboard& keyboard, Player& player, Camera &camera)
 	{
 		if (!isBenchmark)
 		{
-			delete benchmarkPlayer;
-			benchmarkPlayer = new Player();
-			benchmarkState = 0;
-			
-			initBenchmarkMap();
-			
-			camera.setPlayer(benchmarkPlayer);
-			
-			useBenchmarkMap = true;
+			startBenchmark(camera);
 		}
 		else
 		{

@@ -2,6 +2,10 @@
 #include "Line.cpp"
 #include "Camera.h"
 
+//gpu sound
+//int quality = 20;
+int quality = 1;
+
 // debug
 void drawBorderCrossCircle(NextEngine&, std::vector<RayCollision>);
 
@@ -31,7 +35,7 @@ void Camera::renderMap(Map& map)
 	double startAngle = this->player->getAngle();
 	
 	// send rays in screenWidth different directions (going left and right from center)
-	for (int screenX = 0; screenX <= screenWidth / 2; screenX++)
+	for (int screenX = 0; screenX <= screenWidth / 2; screenX+=quality)
 	{
 		// rays should be send with linear angle difference until the fov is reached
 		double rayDiff = (this->currentFov / 2) / screenWidth * screenX;
@@ -44,22 +48,32 @@ void Camera::renderMap(Map& map)
 	}
 }
 
+int lastX;
+int lastY;
+int lastHeight;
+int lastWidth;
+
 void Camera::renderRay(Map& map, double rayStartX, double rayStartY, int screenX, double rayAngle)
 {
+	lastX = 0;
+	lastY = 0;
+	lastHeight = 0;
+	lastWidth = 0;
+	
 	// Detect every possible border the line crosses
 	Ray ray(rayStartX, rayStartY, rayAngle);
 	ray.setMapSize(map.getWidth(), map.getHeight());
 	std::vector<RayCollision> collisions = ray.send();
 	
 	// debug
-	if (screenX == 0 || screenX == screenWidth / 2 || screenX == -screenWidth / 2)
+	if (screenX == 0 || screenX == screenWidth / 2 || screenX == -screenWidth / quality)
 		drawBorderCrossCircle(this->engine, collisions);
 	
 	std::vector<Line> blockLines;
 	for (int i = 0; i < collisions.size(); ++i)
 	{
-		double blockX = std::floor(collisions[i].x);
-		double blockY = std::floor(collisions[i].y);
+		int blockX = (int)(collisions[i].x);
+		int blockY = (int)(collisions[i].y);
 		
 		
 		if (collisions[i].y == blockY)
@@ -82,12 +96,8 @@ void Camera::renderRay(Map& map, double rayStartX, double rayStartY, int screenX
 	std::reverse(blockLines.begin(), blockLines.end());
 	this->renderBlockLines(blockLines, screenX);
 }
-int lastX = 0;
-int lastY = 0;
-int lastHeight = 0;
-int lastWidth = 0;
 
-void Camera::generateBlockLine(std::vector<Line> &blockLines, double blockX, double blockY, RayCollision collision, double rayStartX, double rayStartY, Map& map, double offsetX, int side)
+void Camera::generateBlockLine(std::vector<Line> &blockLines, int blockX, int blockY, RayCollision collision, double rayStartX, double rayStartY, Map& map, double offsetX, int side)
 {
 	Block *blockPtr = map.getBlock(blockX, blockY);
 	
@@ -97,17 +107,17 @@ void Camera::generateBlockLine(std::vector<Line> &blockLines, double blockX, dou
 		
 		// distance between ray start point and block
 		// Formular: sqrt( (x2 - x1)^2 + (y2 - y1)^2 )
-		double fishEyeLength = std::sqrt( std::pow(rayStartX - collision.x, 2) + pow(rayStartY - collision.y, 2) );
+		double fishEyeLength = sqrt( pow(rayStartX - collision.x, 2) + pow(rayStartY - collision.y, 2) );
 		
 		// -fov/2 for the most left ray, 0 for the center and fov/2 for the most right ray. (After that convert from degress to radiens)
 		double angleOffset = ((this->currentFov / 2) / (screenWidth) * offsetX) * M_PI / 180;
 		// because the screen is flat, every line would appear distorted (fish eye effect)
 		// to fix this, the length of each ray has to be corrected, by multiplying it with cos(angleOffset)
-		double length = fishEyeLength * std::cos(angleOffset);
+		double length = fishEyeLength * cos(angleOffset);
 		
 		double height = block.zHeight / 768.0 * screenHeight;
 		height = height / (length);
-		double width = 1;
+		double width = quality;
 		
 		double drawX =  screenWidth / 2 + offsetX;
 		double drawY = screenHeight - height;
@@ -120,7 +130,11 @@ void Camera::generateBlockLine(std::vector<Line> &blockLines, double blockX, dou
 		drawY -= block.zOffset* (1/length);
 
 		// skip drawing if block is completly covered by the previous block
-		if (drawX >= lastX && drawX + width <= lastX + lastWidth && drawY >= lastY && drawY + height <= lastY + lastHeight)
+		if (lastY <= 0 && lastHeight >= screenHeight ||
+			drawX >= lastX && drawX + width <= lastX + lastWidth && drawY >= lastY && drawY + height <= lastY + lastHeight)
+			return;
+		// skip drawing if block is not in screen
+		else if (drawY + height < 0 || drawX + width < 0 || drawY > screenHeight || drawX > screenWidth)
 			return;
 		else
 		{
@@ -191,3 +205,53 @@ void Camera::renderBlockLines(std::vector<Line> &blockLines, int offsetX)
 		this->engine.drawImage(this->textures[line.textureNum], textureX, textureY, textureW, textureH, line.drawX, line.drawY, line.width, line.height);
 	}
 }
+
+/*void Camera::renderFloor(Line &line)
+{
+	//FLOOR CASTING
+	double floorXWall, floorYWall; //x, y position of the floor texel at the bottom of the wall
+	
+	//4 different wall directions possible
+	//if(side == 0 && rayDirX > 0)
+	//{
+		floorXWall = line.blockX;
+		floorYWall = line.blockY;
+	//}
+	/*else if(side == 0 && rayDirX < 0)
+	{
+		floorXWall = mapX + 1.0;
+		floorYWall = mapY + wallX;
+	}
+	else if(side == 1 && rayDirY > 0)
+	{
+		floorXWall = mapX + wallX;
+		floorYWall = mapY;
+	}
+	else
+	{
+		floorXWall = mapX + wallX;
+		floorYWall = mapY + 1.0;
+	}*/
+	
+	/*double distWall, distPlayer, currentDist;
+	
+	distWall = perpWallDist;
+	distPlayer = 0.0;
+
+	//draw the floor from drawEnd to the bottom of the screen
+	for(int y = line.drawY + line.height + 1; y < screenHeight; y++)
+	{
+		currentDist = h / (2.0 * y - h); //you could make a small lookup table for this instead
+		double weight = (currentDist - distPlayer) / (distWall - distPlayer);
+		
+		double currentFloorX = weight * floorXWall + (1.0 - weight) * posX;
+		double currentFloorY = weight * floorYWall + (1.0 - weight) * posY;
+
+		int floorTexX, floorTexY;
+		floorTexX = int(currentFloorX * texWidth) % texWidth;
+		floorTexY = int(currentFloorY * texHeight) % texHeight;
+
+        //floor
+        buffer[y][x] = (texture[3][texWidth * floorTexY + floorTexX] >> 1) & 8355711;
+      }	
+}*/

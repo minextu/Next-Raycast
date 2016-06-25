@@ -33,8 +33,8 @@ std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 	int mapHeight = this->mapHeight;
 	
 	// defines the needed speed to create the ray with the Angle 'rayAngle'
-	double speedX = std::cos(rayAngle);
-	double speedY = std::sin(rayAngle);
+	double speedX = cos(rayAngle);
+	double speedY = sin(rayAngle);
 	
 	for (int i = 0; !end; i++)
 	{
@@ -56,10 +56,10 @@ std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 		*
 		*  distanceX = (round(posX) + nextBlockX - posX) / speedX
 		*/
-		double distanceXCurrent = (std::round(posX) - posX) / speedX;
-		double distanceXNext = (std::round(posX) + nextBlockX - posX) / speedX;
-		double distanceYCurrent = (std::round(posY) - posY) / speedY;
-		double distanceYNext = (std::round(posY) + nextBlockY - posY) / speedY;
+		double distanceXCurrent = (round(posX) - posX) / speedX;
+		double distanceXNext = (round(posX) + nextBlockX - posX) / speedX;
+		double distanceYCurrent = (round(posY) - posY) / speedY;
+		double distanceYNext = (round(posY) + nextBlockY - posY) / speedY;
 		
 		double distanceY;
 		double distanceX;
@@ -84,8 +84,8 @@ std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 		// stop if first block was hit
 		if (stopFirst)
 		{
-			double blockX = std::floor(posX);
-			double blockY = std::floor(posY);
+			int blockX = (int)(posX);
+			int blockY = (int)(posY);
 			Block* block = map->getBlock(blockX,blockY);
 			
 			if (block != nullptr && block->type != 0)
@@ -104,8 +104,8 @@ std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 			collisions.push_back(RayCollision(posX, posY));
 		else
 		{
-			double blockX = std::floor(posX);
-			double blockY = std::floor(posY);
+			int blockX = (int)floor(posX);
+			int blockY = (int)floor(posY);
 			Block* block = map->getBlock(blockX,blockY);
 			
 			if (block != nullptr && block->type != 0)

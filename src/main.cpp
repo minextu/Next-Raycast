@@ -4,6 +4,10 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -33,13 +37,13 @@ double currentFps = 999900;
 double delta(double x)
 {
 	x = x / currentFps * 60.0;
+	return x;
 }
 
 int startLoop(NextEngine&, NextImage[]);
-int game(NextEngine&, int, NextImage[]);
 
 
-// loads textures and fonts to vram
+// loads textures and fonts to ram
 int textureNum = 9;
 void loadMedia(NextEngine& engine, NextImage images[])
 {	
@@ -90,16 +94,18 @@ void newGame(NextEngine& engine, NextImage images[])
 	camera.setTextures(images);
 }
 
+NextEngine engine;
+NextImage *images;
+
 int main()
 {	
-	NextEngine engine;
 	
 	char title[] = "Game Test";
 	engine.createWindow(title, screenWidth, screenHeight);
 	
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 	
-	NextImage images[textureNum+1];
+	images = new NextImage[textureNum+1];
 	loadMedia(engine, images);
 	
 	newGame(engine, images);
@@ -156,53 +162,26 @@ void checkEvents(SDL_Event e, bool* quit)
 
 	}	
 }
+int loopNum = 0;
+bool quit = false;
+SDL_Event e;
+long double lastTime;
+long double currentTime = 0;
 
-int startLoop(NextEngine& engine, NextImage images[])
+void loop()
 {
-	bool quit = false;
-	
-	long double lastTime = SDL_GetTicks();
-	long double currentTime = SDL_GetTicks();
-	
-	std::cout << currentTime - lastTime;
-	
-	int loopNum = 0;
-	SDL_Event e;
-	while (!quit)
-	{
-		loopNum++;
+	loopNum++;
 		
-		checkEvents(e, &quit);
-		if (mouse.enabled)
-			SDL_GetRelativeMouseState(&mouse.x, &mouse.y);
+	checkEvents(e, &quit);
+	if (mouse.enabled)
+		SDL_GetRelativeMouseState(&mouse.x, &mouse.y);
 		
-		engine.clear();
+	engine.clear();
 		
-		// main game loop
-		game(engine, loopNum, images);
-		
-		// show fps
-		engine.setColor("white");
-		engine.fillText("FPS:" + std::to_string(currentFps), 0,screenHeight - 40);
-		
-		// draw all changes
-		engine.render();
-		
-		// calculate FPS
-		currentTime = SDL_GetTicks();
-		currentFps = 1000 / (currentTime - lastTime);
-		
-		lastTime = currentTime;
-	}
-}
-
-int game(NextEngine& engine, int loopNum, NextImage images[])
-{
+	// main game loop
 	//debug
 	engine.setColor("gray");
 	engine.fillRect(0, 0, debugSize*13,debugSize*10);
-	
-		
 	
 	// debug: handle Benchmark
 	checkBenchmark(keyboard, player, camera);
@@ -237,4 +216,34 @@ int game(NextEngine& engine, int loopNum, NextImage images[])
 	// debug: show map
 	drawGrid(engine,map);
 	drawMap(engine,map);
+		
+	// show fps
+	engine.setColor("white");
+	engine.fillText("FPS:" + std::to_string(currentFps), 0,screenHeight - 40);
+		
+	// draw all changes
+	engine.render();
+		
+	// calculate FPS
+	currentTime = SDL_GetTicks();
+	currentFps = 1000 / (currentTime - lastTime);
+		
+	lastTime = currentTime;
+}
+
+int startLoop(NextEngine& engine, NextImage images[])
+{
+
+	#ifdef EMSCRIPTEN
+	emscripten_set_main_loop(loop, 0, 1);
+	#else
+	while (!quit) 
+	{
+		loop();
+	}
+	#endif
+}
+
+int game()
+{
 }

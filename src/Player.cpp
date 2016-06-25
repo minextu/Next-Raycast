@@ -61,30 +61,30 @@ void Player::setZ(double z)
 
 void Player::moveForward()
 {
-	double speedX = std::cos(this->angle);
-	double speedY = std::sin(this->angle);
+	double speedX = cos(this->angle);
+	double speedY = sin(this->angle);
 	this->move( speedX, speedY);
 }
 
 void Player::moveBackward()
 {
-	double speedX = std::cos(this->angle);
-	double speedY = std::sin(this->angle);
+	double speedX = cos(this->angle);
+	double speedY = sin(this->angle);
 	this->move(-speedX, -speedY);
 }
 
 void Player::moveLeft()
 {
-	double x = std::cos(this->angle);
-	double y = std::sin(this->angle);
+	double x = cos(this->angle);
+	double y = sin(this->angle);
 	rotateDir(x,y,-90);
 	
 	this->move(x, y);
 }
 void Player::moveRight()
 {
-	double x = std::cos(this->angle);
-	double y = std::sin(this->angle);
+	double x = cos(this->angle);
+	double y = sin(this->angle);
 	rotateDir(x,y,90);
 	
 	this->move(x, y);
