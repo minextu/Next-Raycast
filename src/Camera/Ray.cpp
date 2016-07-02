@@ -113,7 +113,7 @@ std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 		}
 		
 		// stop the loop, if we are past the map size
-		if (speedX < 0 && posX <= 0 || speedX > 0 && posX >= mapWidth || speedY < 0 && posY <= 0 || speedY > 0 && posY >= mapHeight)
+		if (speedX <= 0 && posX <= 0 || speedX > 0 && posX >= mapWidth || speedY < 0 && posY <= 0 || speedY >= 0 && posY >= mapHeight)
 		{
 			end = true;
 			break;

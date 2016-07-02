@@ -12,6 +12,10 @@ struct Keyboard
 	bool two = false;
 	bool three = false;
 	bool nine = false;
+	bool q = false;
+	bool x = false;
+	bool y = false;
+	bool shift = false;
 	
 	void getKey(SDL_Event e);
 };

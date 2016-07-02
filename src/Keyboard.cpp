@@ -50,6 +50,18 @@ void Keyboard::getKey(SDL_Event e)
 			case SDLK_0:
 				this->zero = down;
 				break;
+			case SDLK_q:
+				this->q = down;
+				break;
+			case SDLK_x:
+				this->x = down;
+				break;
+			case SDLK_y:
+				this->y = down;
+				break;
+			case SDLK_LSHIFT:
+				this->shift = down;
+				break;
 		}
 	}
 }
