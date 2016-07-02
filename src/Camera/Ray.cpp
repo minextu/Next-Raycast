@@ -36,7 +36,7 @@ std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 	double speedX = cos(rayAngle);
 	double speedY = sin(rayAngle);
 	
-	for (int i = 0; !end && i < 100; i++)
+	for (int i = 0; !end; i++)
 	{
 		// nextBlock has to be negative if the speed is also negative
 		int nextBlockX = blockWidth;
