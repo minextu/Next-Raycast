@@ -36,11 +36,12 @@ std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 	double speedX = cos(rayAngle);
 	double speedY = sin(rayAngle);
 	
-	for (int i = 0; !end; i++)
+	for (int i = 0; !end && i < 100; i++)
 	{
 		// nextBlock has to be negative if the speed is also negative
 		int nextBlockX = blockWidth;
 		int nextBlockY = blockHeight;
+		
 		if (speedX < 0)
 			nextBlockX = -nextBlockX;
 		if (speedY < 0)
@@ -56,10 +57,10 @@ std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 		*
 		*  distanceX = (round(posX) + nextBlockX - posX) / speedX
 		*/
-		double distanceXCurrent = (round(posX) - posX) / speedX;
-		double distanceXNext = (round(posX) + nextBlockX - posX) / speedX;
-		double distanceYCurrent = (round(posY) - posY) / speedY;
-		double distanceYNext = (round(posY) + nextBlockY - posY) / speedY;
+		double distanceXCurrent = abs((round(posX) - posX) / speedX);
+		double distanceXNext = abs((round(posX) + nextBlockX - posX) / speedX);
+		double distanceYCurrent = abs((round(posY) - posY) / speedY);
+		double distanceYNext = abs((round(posY) + nextBlockY - posY) / speedY);
 		
 		double distanceY;
 		double distanceX;
@@ -113,7 +114,7 @@ std::vector<RayCollision> Ray::send(bool stopFirst, bool hideAir, Map* map)
 		}
 		
 		// stop the loop, if we are past the map size
-		if (speedX <= 0 && posX <= 0 || speedX > 0 && posX >= mapWidth || speedY < 0 && posY <= 0 || speedY >= 0 && posY >= mapHeight)
+		if (speedX < 0 && posX <= 0 || speedX > 0 && posX >= mapWidth || speedY < 0 && posY <= 0 || speedY > 0 && posY >= mapHeight)
 		{
 			end = true;
 			break;
