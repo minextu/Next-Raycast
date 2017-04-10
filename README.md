@@ -3,7 +3,7 @@
 A 3D Raycaster written in C++ and SDL2
 
 ## Online (HTML5 Version)
-[Game](https://builds.et.tc/raycaser/master-html5/game.html)
+[Game](https://builds.et.tc/raycaster/master-html5/game.html)
 
 [Editor](https://builds.et.tc/raycaster/master-html5/editor.html)
 
