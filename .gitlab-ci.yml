@@ -26,7 +26,7 @@ deploy_linux64:
         name: linux-$CI_BUILD_REF_NAME
         url: https://builds.et.tc/raycaster/$CI_BUILD_REF_NAME-linux64.zip
     only:
-        - branchesJan/SDL_Game
+        - branches@Jan/SDL_Game
 
 deploy_windows64:
     stage: deploy
