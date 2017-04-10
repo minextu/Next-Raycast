@@ -1,0 +1,51 @@
+image: minextu/mingw-sdl2:latest
+
+stages:
+    - compile
+    - deploy
+
+compile_linux:
+    stage: compile
+    script:
+        - bash ci/compile.sh linux
+
+compile_windows:
+    stage: compile
+    script:
+        - bash ci/compile.sh win64
+
+deploy_linux64:
+    stage: deploy
+    script:
+        - bash ci/compile.sh linux
+        - bash ci/deploy.sh linux64
+    environment:
+        name: linux-$CI_BUILD_REF_NAME
+        url: https://builds.et.tc/raycaster/$CI_BUILD_REF_NAME-linux64.zip
+    only:
+        - branchesJan/SDL_Game
+
+deploy_windows64:
+    stage: deploy
+    script:
+        - bash ci/compile.sh win64
+        - bash ci/deploy.sh win64
+    environment:
+        name: windows-$CI_BUILD_REF_NAME
+        url: https://builds.et.tc/raycaster/$CI_BUILD_REF_NAME-win64.zip
+    only:
+        - branches@Jan/SDL_Game
+
+deploy_html5:
+    stage: deploy
+    script:
+        - pacman --noconfirm -Sy emscripten python
+        - source /etc/profile.d/emscripten.sh
+        - emcc -v
+        - bash ci/compile.sh html5
+        - bash ci/deploy.sh html5
+    environment:
+        name: html5-$CI_BUILD_REF_NAME
+        url: https://builds.et.tc/raycaster/$CI_BUILD_REF_NAME-html5/
+    only:
+        - branches@Jan/SDL_Game
