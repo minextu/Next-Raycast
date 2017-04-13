@@ -1,8 +1,5 @@
 image: minextu/mingw-sdl2:latest
 
-variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-
 stages:
     - compile
     - deploy
