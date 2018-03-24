@@ -10,8 +10,6 @@ else
     exit
 fi
 
-pacman --noconfirm -Sy zip
-
 rm -rf deploy && mkdir deploy && cd deploy
 
 # copy binaries

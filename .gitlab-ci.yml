@@ -1,4 +1,4 @@
-image: minextu/mingw-sdl2:latest
+image: minextu/sdl2-cross-platform:latest
 
 stages:
     - compile
@@ -39,9 +39,7 @@ deploy_windows64:
 deploy_html5:
     stage: deploy
     script:
-        - pacman --noconfirm -Sy emscripten python
-        - source /etc/profile.d/emscripten.sh
-        - emcc -v
+        - source /opt/emsdk-portable/emsdk_env.sh
         - bash ci/compile.sh html5
         - bash ci/deploy.sh html5
     environment:
